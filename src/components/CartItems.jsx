@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
 import { ShopContext } from "../context/StoreContext";
+import { Button } from "flowbite-react";
 
 const CartItems = () => {
-  const { products, addToCart } = useContext(ShopContext);
+  const { products,addToCart } = useContext(ShopContext);
 
   return (
     <div className="w-[80%] m-auto grid grid-cols-4 gap-10 py-14">
@@ -18,7 +19,7 @@ const CartItems = () => {
               <p className="text-red-400">${item.price}</p>
               <p>{item.rating}⭐</p>
             </div>
-            <button className="bg-green-500 px-4 py-2 rounded font-medium mt-3" onClick={() => addToCart(item.id)}>ADD TO CART</button>
+            <Button color="blue" onClick={()=>addToCart(item.id)+alert("Added To Cart")}>ADD TO CART</Button>
           </div>
         </div>
       ))}

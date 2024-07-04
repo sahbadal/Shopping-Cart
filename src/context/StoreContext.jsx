@@ -2,74 +2,89 @@ import React, { createContext, useState, useEffect } from "react";
 
 export const ShopContext = createContext(null);
 
+
+
+
+
 const ShopContextProvider = (props) => {
+  
+  const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
-  const [cartItems, setCartItems] = useState({}); // State to hold cart items
 
-  // Fetch products from API
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch("https://dummyjson.com/products");
-      if (!response.ok) {
-        throw new Error("Network response is not ok");
-      }
-      const data = await response.json();
-      setProducts(data.products);
-    } catch (error) {
-      console.error("Error fetching products:", error.message);
+  const getDefaultCart = () =>{
+    let cart = {};
+    for(let i=1;i<products.length+1;i++){
+      cart[i] =0;
     }
-  };
+    return cart;
+  
+  }
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  
+ // Fetch products from API
+const fetchProducts = async () => {
+  try {
+    const response = await fetch("https://dummyjson.com/products");
+    if (!response.ok) {
+      throw new Error("Network response is not ok");
+    }
+    const data = await response.json();
+    setProducts(data.products);
+  } catch (error) {
+    console.error("Error fetching products:", error.message);
+  }
+};
 
-  // Function to add item to cart
-  const addToCart = (productId) => {
-    setCartItems((prevCartItems) => {
-      const updatedCartItems = { ...prevCartItems };
-      if (updatedCartItems[productId]) {
-        updatedCartItems[productId] += 1; // Increment quantity if already in cart
-      } else {
-        updatedCartItems[productId] = 1; // Add new item to cart
+useEffect(() => {
+  fetchProducts();
+}, []);
+
+
+//initialization of cart;
+useEffect(()=>{
+  if(products.length>0){
+    setCartItems(getDefaultCart());
+  }
+},[products])
+
+  const addToCart = (itemId)=>{
+    setCartItems((prev)=>({...prev,[itemId]: prev[itemId] +1}));
+  }
+
+  const removeFromCart = (itemId) => {
+    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }))
+}
+
+const getTotalCartAmount = () => {
+  let totalAmount = 0;
+  for (const item in cartItems) {
+      if (cartItems[item] > 0) {
+          let itemInfo = products.find(product => product.id === Number(item));
+          if (itemInfo) {
+              totalAmount += itemInfo.price * cartItems[item];
+          }
       }
-      return updatedCartItems;
-    });
-  };
+  }
+  return totalAmount;
+}
 
-  // Function to remove item from cart
-  const removeFromCart = (productId) => {
-    setCartItems((prevCartItems) => {
-      const updatedCartItems = { ...prevCartItems };
-      if (updatedCartItems[productId] > 1) {
-        updatedCartItems[productId] -= 1; // Decrease quantity if more than 1
-      } else {
-        delete updatedCartItems[productId]; // Remove item if only 1 left
+const getTotalCartItems = () => {
+  let totalItem = 0;
+  for (const item in cartItems) {
+      if (cartItems[item] > 0) {
+          totalItem += cartItems[item];
       }
-      return updatedCartItems;
-    });
-  };
-
-  // Function to get total count of items in cart
-  const getCartCount = () => {
-    let totalCount = 0;
-    Object.values(cartItems).forEach((quantity) => {
-      totalCount += quantity;
-    });
-    return totalCount;
-  };
-
-  const clearCart = () => {
-    setCartItems({});
-  };
+  }
+  return totalItem;
+}
 
   const contextValues = {
     products,
+    cartItems,
     addToCart,
     removeFromCart,
-    cartItems,
-    getCartCount,
-    clearCart
+    getTotalCartAmount,
+    getTotalCartItems
   };
 
   return (

@@ -1,56 +1,82 @@
 import React, { useContext } from "react";
+import { Button } from "flowbite-react";
 import { ShopContext } from "../context/StoreContext";
+import { assets } from "../assets/assets";
 
-const ShopingCart = () => {
-  const { products, cartItems, addToCart, removeFromCart,clearCart } = useContext(ShopContext);
-
-  // Function to calculate total price for a product
-  const calculateTotalPrice = (productId) => {
-    const product = products.find((item) => item.id === productId);
-    return product ? product.price * cartItems[productId] : 0;
-  };
+const ShoppingCart = () => {
+  const { products, cartItems, addToCart, removeFromCart,getTotalCartAmount } = useContext(ShopContext);
 
   return (
-    <div className="w-[80%] m-auto py-14">
-      <h1 className="text-3xl font-semibold mb-8">Shopping Cart</h1>
-      {Object.keys(cartItems).length === 0 ? (
-        <p className="text-lg">Your cart is empty.</p>
-      ) : (
-        <>
-          {Object.keys(cartItems).map((productId) => {
-            const product = products.find((item) => item.id === parseInt(productId));
-            return (
-              <div key={productId} className="flex items-center justify-between mb-6 border-b pb-4">
-                <img src={product.thumbnail} alt={product.title} className="w-24 h-24 object-cover rounded-md" />
-                <div className="flex-grow ml-4">
-                  <h2 className="text-xl font-semibold">{product.title}</h2>
-                  <p className="text-gray-600">Price: ${product.price.toFixed(2)}</p>
-                  <div className="flex items-center mt-2">
-                    <button className="text-gray-500" onClick={() => removeFromCart(parseInt(productId))}>-</button>
-                    <p className="mx-2">{cartItems[productId]}</p>
-                    <button className="text-gray-500" onClick={() => addToCart(parseInt(productId))}>+</button>
-                    <button className="text-red-500 ml-4" onClick={() => removeFromCart(parseInt(productId))}>Remove</button>
-                  </div>
-                </div>
-                <p className="text-red-400">Total: ${calculateTotalPrice(parseInt(productId)).toFixed(2)}</p>
-              </div>
-            );
-          })}
-          <div className="mt-8 flex justify-between">
-            <button className="bg-red-500 text-white px-4 py-2 rounded-md" onClick={clearCart}>
-              Clear Cart
-            </button>
-            <div>
-              <p className="text-xl font-semibold">Total:</p>
-              <p className="text-red-500 text-2xl font-bold">
-                ${Object.keys(cartItems).reduce((acc, productId) => acc + calculateTotalPrice(parseInt(productId)), 0).toFixed(2)}
-              </p>
+    <div className="bg-gray-100 h-screen py-8">
+      <div className="w-[80%] mx-auto">
+        <h1 className="text-2xl font-semibold mb-4">Shopping Cart</h1>
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="md:w-3/4">
+            <div className="bg-white rounded-lg shadow-md p-6 mb-4">
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="text-left font-semibold">Product</th>
+                    <th className="text-left font-semibold">Price</th>
+                    <th className="text-left font-semibold">Quantity</th>
+                    <th className="text-left font-semibold">Total</th>
+                    <th className="text-left font-semibold">Remove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((item) => {
+                    if (item&&cartItems[item.id] > 0) {
+                      return (
+                        <tr key={item.id}>
+                          <td className="py-4">
+                            <div className="flex items-center">
+                              <img className="h-16 w-16 mr-4 shadow rounded" src={item.thumbnail} alt="Product image" />
+                              <span className="font-semibold">{item.title}</span>
+                            </div>
+                          </td>
+                          <td className="py-4">${item.price}</td>
+                          <td className="py-4">
+                            <div className="flex items-center">
+                              <button className="text-md font-medium border border-solid border-gray-300 py-1 px-2 rounded" onClick={()=>removeFromCart(item.id)}>-</button>
+                              <span className="text-center w-8 ">{cartItems[item.id]}</span>
+                              <button className="text-md font-medium border border-solid border-gray-300 py-1 px-2 rounded" onClick={()=>addToCart(item.id)}>+</button>
+                            </div>
+                          </td>
+                          <td className="py-4">${item.price * cartItems[item.id]}</td>
+                          <td><img onClick={()=>removeFromCart(item.id)} src={assets.remove_icon} className="w-5 cursor-pointer ml-4"/></td>
+                        </tr>
+                      );
+                    }
+        
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
-        </>
-      )}
+          <div className="md:w-1/4">
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-lg font-semibold mb-4">Summary</h2>
+              <div className="flex justify-between mb-2">
+                <span>Subtotal</span>
+                <span>${getTotalCartAmount()}</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span>Taxes</span>
+                <span>Free</span>
+              </div>
+              <hr className="my-2" />
+              <div className="flex justify-between mb-2">
+                <span className="font-semibold">Total</span>
+                <span className="font-semibold">${getTotalCartAmount()}</span>
+              </div>
+              <Button className="w-full bg-blue-600" onClick={()=>alert("Order Placed")}>Checkout</Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
+
 };
 
-export default ShopingCart;
+export default ShoppingCart;

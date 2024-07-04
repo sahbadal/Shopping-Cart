@@ -4,7 +4,7 @@ import { useContext } from 'react'
 import { ShopContext } from '../context/StoreContext.jsx'
 
 const Navbar = () => {
-  const {getCartCount} = useContext(ShopContext);
+  const {getTotalCartItems} = useContext(ShopContext);
   return (
     <div className='py-3 shadow'>
       <div className='w-[80%] m-auto flex items-center justify-between'>
@@ -14,7 +14,7 @@ const Navbar = () => {
         <div>
           <ul className='flex items-center gap-8'>
             <Link to={'/'}><li className='font-medium'>Home</li></Link>
-            <Link to={'/cart'}><li className='flex items-center gap-1'><img src={assets.cart_logo} className='w-8' /><span className='text-2xl'>{getCartCount()}</span></li></Link>
+            <Link to={'/cart'}><li className='flex items-center gap-1'><img src={assets.cart_logo} className='w-8' /><span className='text-2xl'>{getTotalCartItems()}</span></li></Link>
           </ul>
         </div>
       </div>
